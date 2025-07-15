@@ -18,6 +18,8 @@ This project provides a web-based dashboard for uploading videos, processing the
 - **Data Management**: Clear all uploaded and processed video data with a single click, or delete individual video logs.
 
 ---
+NOTE
+Optional but effective use a GPU 
 
 ## 🛠️ Technologies Used
 
@@ -38,6 +40,7 @@ This project provides a web-based dashboard for uploading videos, processing the
 - **Font Awesome** – Icons
 
 ---
+🔎 Note: This project supports both GPU and CPU. If an NVIDIA GPU is available, PyTorch will use it for faster processing. Otherwise, the system will automatically fall back to CPU execution.
 
 ## ⚙️ Setup and Installation
 
