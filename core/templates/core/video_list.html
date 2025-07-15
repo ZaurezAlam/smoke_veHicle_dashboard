@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Processing Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .upload-section {
+            margin-top: 40px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-email {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        .btn-email-client {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .video-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            margin: -25px -25px 20px -25px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .video-title {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .video-date {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .video-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .video-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .video-player {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .video-player video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .analytics-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .email-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-item {
+            text-align: center;
+        }
+
+        .chart-item img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .chart-item img:hover {
+            transform: scale(1.05);
+        }
+
+        .chart-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .separator {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ddd, transparent);
+            margin: 20px 0;
+        }
+        .modal-content {
+    max-width: 95%;
+    max-height: 90vh;
+    overflow: auto;
+    padding: 20px;
+}
+    </style>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-video"></i> Video Processing Dashboard</h1>
+            <p>Upload, process, and analyze your videos with advanced AI-powered insights</p>
+        </div>
+
+        <div class="upload-section fade-in">
+            <h2><i class="fas fa-cloud-upload-alt"></i> Upload New Video</h2>
+            <p style="margin: 15px 0; color: #666;">Drag and drop your video file or click to browse</p>
+            <a href="{% url 'core:upload_video' %}" class="btn btn-primary">
+                <i class="fas fa-upload"></i> Choose Video File
+            </a>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{% url 'core:upload_video' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Upload New Video
+            </a>
+            <a href="{% url 'core:upload_video' %}" class="btn btn-success">
+                <i class="fas fa-arrow-left"></i> Back to Upload
+            </a>
+            <button onclick="showClearConfirm()" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Clear All Data
+            </button>
+        </div>
+        <div class="results-section">
+            <h2 style="color: white; text-align: center; margin-bottom: 30px; font-size: 2em;">
+                <i class="fas fa-chart-bar"></i> Processed Results
+            </h2>
+
+            {% for video in videos %}
+                <div class="video-card fade-in">
+                    <div class="video-header">
+                        <div class="video-title">
+                            <i class="fas fa-video"></i>
+                            Video {{ video.id }}
+                        </div>
+                        <div class="video-date">
+                            <i class="fas fa-calendar"></i> {{ video.uploaded_at }}
+                        </div>
+                    </div>
+
+                    <div class="video-content">
+                        {% if video.processed_video %}
+                            <div class="video-section">
+                                <h3><i class="fas fa-play-circle"></i> Processed Video</h3>
+                                <div class="video-player">
+                                    <video controls poster="/static/img/video-placeholder.png">
+                                        <source src="{{ video.processed_video.url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                                <div class="download-links">
+                                    <a href="{{ video.processed_video.url }}" download class="btn btn-outline">
+                                        <i class="fas fa-download"></i> Download Video
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="analytics-section">
+                            <h3><i class="fas fa-chart-line"></i> Analytics & Reports</h3>
+
+                            {% if video.summary_excel %}
+                                <div class="download-links">
+                                    <a href="{{ video.summary_excel.url }}" class="btn btn-outline">
+                                        <i class="fas fa-file-excel"></i> Download Excel Summary
+                                    </a>
+                                </div>
+
+                                <div class="email-actions">
+                                    <button onclick="openEmailModal('{{ video.id }}', '{{ video.summary_excel.url }}', '{{ video.uploaded_at }}')" 
+                                            class="btn btn-email-client">
+                                        <i class="fas fa-envelope"></i> Email Client
+                                    </button>
+                                    
+                                    <form method="POST" action="{% url 'core:send_email_summary' %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="video_id" value="{{ video.id }}">
+                                        <input type="hidden" name="excel_file_url" value="{{ video.summary_excel.url }}">
+                                        <input type="hidden" name="recipient_email" value="huzaifakamboh102@gmail.com">
+                                        <button type="submit" class="btn btn-email">
+                                            <i class="fas fa-paper-plane"></i> Send via Server
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+
+                            <div class="separator"></div>
+
+                            <div class="charts-grid">
+                                {% if video.bar_chart_image %} {# <-- FIX: Changed from video.bar_chart #}
+                                    <div class="chart-item">
+                                        <div class="chart-label">
+                                            <i class="fas fa-chart-bar"></i> Bar Chart
+                                        </div>
+                                        <img src="{{ video.bar_chart_image.url }}" {# <-- FIX: Changed from video.bar_chart.url #}
+                                             alt="Bar Chart"
+                                             onclick="openImageModal('{{ video.bar_chart_image.url }}', 'Bar Chart')"> {# <-- FIX: Changed #}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if video.pie_chart_image %} {# <-- FIX: Changed from video.pie_chart #}
+                                    <div class="chart-item">
+                                        <div class="chart-label">
+                                            <i class="fas fa-chart-pie"></i> Pie Chart
+                                        </div>
+                                        <img src="{{ video.pie_chart_image.url }}" {# <-- FIX: Changed from video.pie_chart.url #}
+                                             alt="Pie Chart"
+                                             onclick="openImageModal('{{ video.pie_chart_image.url }}', 'Pie Chart')"> {# <-- FIX: Changed #}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state fade-in">
+                    <i class="fas fa-video-slash"></i>
+                    <h3>No videos processed yet</h3>
+                    <p style="margin: 15px 0; color: #666;">Upload your first video to get started with AI-powered analysis!</p>
+                    <a href="{% url 'core:upload_video' %}" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload First Video
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope"></i> Send Email</h3>
+                <span class="close" onclick="closeEmailModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="emailRecipient">Recipient Email:</label>
+                <input type="email" id="emailRecipient" value="huzaifakamboh102@gmail.com">
+            </div>
+            <div class="form-group">
+                <label for="emailSubject">Subject:</label>
+                <input type="text" id="emailSubject" readonly>
+            </div>
+            <div class="form-group">
+                <label for="emailBody">Message:</label>
+                <textarea id="emailBody" rows="6" readonly></textarea>
+            </div>
+            <div style="text-align: right;">
+                <button onclick="closeEmailModal()" class="btn btn-outline" style="margin-right: 10px;">Cancel</button>
+                <button onclick="sendEmail()" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Send Email
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal">
+        <div class="modal-content" style="
+            max-width: 90%;
+            margin: 50px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            overflow: auto;">
+            
+            <div class="modal-header">
+                <h3 id="imageModalTitle"></h3>
+                <span class="close" onclick="closeImageModal()">&times;</span>
+            </div>
+            
+            <img id="modalImage" 
+                style="max-width: 100%;
+                       max-height: 80vh;
+                       object-fit: contain;
+                       display: block;
+                       margin: 0 auto;">
+        </div>
+    </div>
+
+    <div id="clearModal" class="modal">
+        <div class="modal-content" style="max-width: 90%; padding: 15px; background: white; border-radius: 15px; overflow: auto;">
+            <div class="modal-header">
+                <h3 style="color: #f44336;"><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h3>
+                <span class="close" onclick="closeClearModal()">&times;</span>
+            </div>
+            <p style="margin: 20px 0;">Are you sure you want to delete all videos and files? This action cannot be undone.</p>
+            <div style="text-align: right;">
+                <button onclick="closeClearModal()" class="btn btn-outline" style="margin-right: 10px;">Cancel</button>
+                <button onclick="confirmClear()" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentVideoData = {};
+
+        // Email Modal Functions
+        function openEmailModal(videoId, excelUrl, uploadedAt) {
+            currentVideoData = { videoId, excelUrl, uploadedAt };
+            
+            const subject = `Video Analysis Report - ${videoId}`;
+            const excelAbsoluteUrl = `${window.location.origin}${excelUrl}`;
+            const body = `Hello,\n\nPlease find the summary Excel sheet for Video ID ${videoId} here:\n${excelAbsoluteUrl}\n\nBest regards,\nYour Project Team`;
+            
+            document.getElementById('emailSubject').value = subject;
+            document.getElementById('emailBody').value = body;
+            document.getElementById('emailModal').style.display = 'block';
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+
+        function sendEmail() {
+            const recipient = document.getElementById('emailRecipient').value;
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            
+            if (!recipient) {
+                alert('Please enter a recipient email address.');
+                return;
+            }
+            
+            const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+            closeEmailModal();
+        }
+
+        // Image Modal Functions
+        function openImageModal(imageUrl, title) {
+            const img = document.getElementById('modalImage');
+            img.src = imageUrl;
+            img.onload = function() {
+                if (img.naturalWidth > window.innerWidth) {
+                    img.style.width = '100%';
+                } else {
+                    img.style.width = 'auto';
+                }
+            };
+            document.getElementById('imageModalTitle').textContent = title;
+            document.getElementById('imageModal').style.display = 'block';
+        }
+
+
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Clear Confirmation Functions
+        function showClearConfirm() {
+            document.getElementById('clearModal').style.display = 'block';
+        }
+
+        function closeClearModal() {
+            document.getElementById('clearModal').style.display = 'none';
+        }
+
+        function confirmClear() {
+            // Create and submit the form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{% url 'core:clear_all_videos' %}";
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = '{{ csrf_token }}';
+            form.appendChild(csrfInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const emailModal = document.getElementById('emailModal');
+            const imageModal = document.getElementById('imageModal');
+            const clearModal = document.getElementById('clearModal');
+            
+            if (event.target === emailModal) {
+                closeEmailModal();
+            } else if (event.target === imageModal) {
+                closeImageModal();
+            } else if (event.target === clearModal) {
+                closeClearModal();
+            }
+        }
+
+        // Add fade-in animation to elements when they come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards for animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.video-card, .upload-section, .empty-state');
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

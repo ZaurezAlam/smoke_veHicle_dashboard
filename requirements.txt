@@ -1,0 +1,16 @@
+# Install with pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu121
+torch
+torchvision
+torchaudio
+ultralytics
+easyocr
+opencv-python-headless
+pandas
+matplotlib
+numpy
+Django>=4.0
+djangorestframework
+Pillow
+openpyxl
+python-dotenv
+Pillow

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Processed Files</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        h1 {
+            color: #333;
+        }
+        .file-block {
+            margin-bottom: 15px;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Download Your Processed Files</h1>
+
+    {% if files %}
+        {% for label, url in files.items %}
+            <div class="file-block">
+                <strong>{{ label|title }}:</strong>
+                <a class="download-btn" href="{{ url }}" download>Download</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No files available to download yet.</p>
+    {% endif %}
+
+    <a href="/" style="margin-top: 30px; display: inline-block;">⬅ Back to Upload</a>
+</body>
+</html>

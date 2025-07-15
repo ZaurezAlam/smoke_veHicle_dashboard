@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+*.log
+*.pot
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Environment
+.env
+
+# VSCode/IDE
+.vscode/
+.idea/
+
+# Virtualenv
+venv/
+.venv/
+
+# Temp files
+core/temp_output/
+

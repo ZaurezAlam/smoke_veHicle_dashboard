@@ -1,0 +1,718 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Upload and Processing</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+.navbar {
+    background-color: #2c3e50;
+    padding: 15px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0;
+    width: 100%;
+    position: fixed; /* ← changed from sticky to fixed */
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.navbar .logo {
+    color: white;
+    font-size: 1.6em;
+    font-weight: bold;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar .logo i {
+    font-size: 1.4em;
+    color: #007bff;
+}
+
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 25px;
+}
+
+.nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-links li a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.nav-links li a.active {
+    background-color: #007bff;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    .nav-container {
+        flex-direction: column;
+        padding: 10px 20px;
+    }
+
+    .navbar .logo {
+        margin-bottom: 15px;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: space-around;
+        gap: 10px;
+    }
+
+    .nav-links li a {
+        padding: 6px 10px;
+        font-size: 0.9em;
+    }
+}
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 80px 0 0 0; /* ← ensure space for fixed navbar */
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: block;
+}
+
+
+/* Optional: Add margin to top of container to push below navbar */
+.container {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    max-width: 700px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 30px auto 0 auto; /* Ensure centered and spaced below navbar */
+}
+
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.2em;
+    font-weight: 600;
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.6em;
+    text-align: center;
+}
+
+/* Section Styling */
+#upload-section, #processing-section, #results-section {
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    margin-top: 25px;
+}
+#upload-section:first-child {
+    border-top: none;
+    margin-top: 0;
+}
+
+/* Form Elements */
+form p {
+    margin-bottom: 15px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.95em;
+}
+
+form input[type="file"],
+form input[type="text"],
+form input[type="email"] {
+    width: calc(100% - 20px); /* Adjust for padding */
+    padding: 12px 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+form input[type="file"]:focus,
+form input[type="text"]:focus,
+form input[type="email"]:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Buttons */
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.05em;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: block; /* Make button full width */
+    width: 100%;
+    margin-top: 25px;
+}
+
+button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Messages & Feedback */
+.message {
+    padding: 12px 20px;
+    margin-top: 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.message i {
+    font-size: 1.2em;
+}
+
+.message.info {
+    background-color: #e6f7ff;
+    color: #0056b3;
+    border: 1px solid #91d5ff;
+}
+
+.message.success {
+    background-color: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+
+.message.error {
+    background-color: #fff1f0;
+    color: #cf1322;
+    border: 1px solid #ffa39e;
+}
+
+/* Progress Bar */
+.progress-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    margin-top: 20px;
+    height: 35px; /* Taller progress bar */
+    overflow: hidden; /* Ensure bar stays within container */
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #28a745; /* Success green */
+    text-align: center;
+    line-height: 35px;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    width: 0%; /* Initial width */
+    transition: width 0.3s ease-out, background-color 0.3s ease-out;
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflowed text */
+}
+
+.progress-bar.failed {
+    background-color: #dc3545; /* Danger red */
+}
+
+.status-text {
+    margin-top: 15px;
+    font-style: italic;
+    color: #555;
+    text-align: center;
+}
+
+/* Results Section */
+.results-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.results-links a {
+    display: inline-block; /* Arrange links side-by-side if space allows */
+    margin: 8px 10px;
+    padding: 10px 15px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #007bff;
+    transition: background-color 0.3s ease;
+}
+
+.results-links a:hover {
+    background-color: #dee2e6;
+}
+
+/* Debug Info */
+.debug-info {
+    background-color: #f0f4f7;
+    border: 1px dashed #cce0eb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 25px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 0.85em;
+    color: #5d6d7e;
+    overflow-x: auto; /* For long debug messages */
+    white-space: pre-wrap; /* Preserve whitespace and wrap */
+    display: none;
+}
+
+/* FontAwesome Integration (if you use it) */
+.fas {
+    margin-right: 8px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px 25px;
+        margin: 20px;
+        margin-top: 80px; 
+    }
+    h1 {
+        font-size: 1.8em;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+}
+
+
+    </style>
+</head>
+<body>
+    {# --- START NAVBAR ADDITION --- #}
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'core:upload_video' %}" class="logo">
+                <i class="fas fa-video"></i>
+                Video Processor
+            </a>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="{% url 'core:upload_video' %}" data-page="upload"><i class="fas fa-cloud-upload-alt"></i> Upload</a></li> 
+                <li><a href="{% url 'core:video_list' %}" data-page="list"><i class="fas fa-list"></i> All Videos</a></li>
+                {# Add more links here if needed #}
+            </ul>
+        </div>
+    </nav>
+    {# --- END NAVBAR ADDITION --- #}
+
+    <div class="container">
+        <h1>Upload Video for Smoke Detection</h1>
+
+        <div id="upload-section">
+            <form id="upload-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit"><i class="fas fa-cloud-upload-alt"></i> Upload Video</button>
+            </form>
+            <div id="upload-message" class="message info"></div>
+            <div id="debug-upload" class="debug-info"></div>
+        </div>
+
+        <div id="processing-section">
+            <h2><i class="fas fa-sync-alt fa-spin"></i> Processing Video...</h2>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <p class="status-text" id="processingStatus">Waiting to start...</p>
+            <div id="processing-error-message" class="message error" style="display: none;"></div>
+            <div id="debug-processing" class="debug-info"></div>
+        </div>
+
+        <div id="results-section">
+            <h2><i class="fas fa-check-circle"></i> Processing Complete!</h2>
+            <div class="results-links" id="videoResultsLinks">
+            </div>
+            <button onclick="sendEmailSummary()" style="background-color: #28a745;"><i class="fas fa-envelope"></i> Send Email Summary</button>
+            <p style="text-align: center; margin-top: 20px;"><a href="{% url 'core:video_list' %}"><i class="fas fa-list-ul"></i> View All Videos</a></p>
+            <button onclick="resetPage()" style="background-color: #6c757d;"><i class="fas fa-redo"></i> Upload Another Video</button>
+        </div>
+    </div>
+
+    <script>
+        // --- JavaScript for dynamic page behavior ---
+        const uploadForm = document.getElementById('upload-form');
+        const uploadMessage = document.getElementById('upload-message');
+        const uploadSection = document.getElementById('upload-section');
+        const processingSection = document.getElementById('processing-section');
+        const resultsSection = document.getElementById('results-section');
+
+        const progressBar = document.getElementById('progressBar');
+        const processingStatus = document.getElementById('processingStatus');
+        const processingErrorMessage = document.getElementById('processing-error-message');
+        const videoResultsLinks = document.getElementById('videoResultsLinks');
+        const debugUpload = document.getElementById('debug-upload');
+        const debugProcessing = document.getElementById('debug-processing');
+        const navLinksContainer = document.getElementById('navLinks'); // Added
+
+        let pollingInterval;
+        let currentVideoId = null;
+        let currentTaskId = null;
+
+        function updateUI(element, text, type = 'info', hide = false) {
+            element.innerHTML = text; // Use innerHTML for icons
+            element.className = `message ${type}`;
+            element.style.display = hide ? 'none' : 'flex';
+            if (element === processingErrorMessage && type === 'error') {
+                 element.style.display = 'flex';
+            } else if (element === processingErrorMessage && type !== 'error') {
+                element.style.display = 'none';
+            }
+        }
+
+        function showDebug(element, message) {
+            console.log('DEBUG:', message);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function resetPage() {
+            clearInterval(pollingInterval);
+            uploadForm.reset();
+            updateUI(uploadMessage, '<i class="fas fa-info-circle"></i> Ready to upload your video.', 'info', false);
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            progressBar.classList.remove('failed');
+            processingStatus.textContent = 'Waiting to start...';
+            updateUI(processingErrorMessage, '', 'error', true);
+            videoResultsLinks.innerHTML = '';
+            
+            currentVideoId = null;
+            currentTaskId = null;
+            
+            debugUpload.style.display = 'none';
+            debugProcessing.style.display = 'none';
+
+            uploadSection.style.display = 'block';
+            processingSection.style.display = 'none';
+            resultsSection.style.display = 'none';
+        }
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            updateUI(uploadMessage, '<i class="fas fa-hourglass-half fa-spin"></i> Uploading... Please wait.', 'info');
+            const submitButton = uploadForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            updateUI(processingErrorMessage, '', 'error', true);
+
+            const formData = new FormData(uploadForm);
+            const csrfToken = formData.get('csrfmiddlewaretoken');
+
+            try {
+                showDebug(debugUpload, 'Starting upload request...');
+                
+                const response = await fetch('/app/api/upload/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                    },
+                });
+
+                showDebug(debugUpload, `Upload response status: ${response.status}`);
+
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    throw new Error(`Server returned non-JSON response (${response.status}): ${textResponse.substring(0, 200)}...`);
+                }
+
+                const data = await response.json();
+                showDebug(debugUpload, `Upload response data: ${JSON.stringify(data)}`);
+
+                if (response.ok) {
+                    const videoId = data.video_id || data.id; 
+                    if (!videoId) {
+                        throw new Error('Server did not return video_id or id');
+                    }
+                    if (!data.task_id) {
+                        throw new Error('Server did not return task_id');
+                    }
+
+                    currentVideoId = videoId;
+                    currentTaskId = data.task_id;
+                    
+                    updateUI(uploadMessage, data.message || '<i class="fas fa-check-circle"></i> Upload successful! Starting processing...', 'success');
+                    uploadSection.style.display = 'none';
+                    processingSection.style.display = 'block';
+
+                    showDebug(debugProcessing, `Starting polling for video_id: ${currentVideoId}, task_id: ${currentTaskId}`);
+
+                    startPollingStatus(currentVideoId, currentTaskId);
+
+                } else {
+                    let errorMsg = data.message || data.error || 'An unexpected error occurred.';
+
+                    if (response.status === 405) {
+                        errorMsg = `Method Not Allowed (405): The server is configured to only accept POST requests for upload.`;
+                    } else if (response.status === 400) {
+                        errorMsg = `Bad Request (400): ${JSON.stringify(data.errors || data)}`;
+                    } else if (response.status === 403) {
+                        errorMsg = `Forbidden (403): You don't have permission to upload. Please ensure you are logged in.`;
+                    } else if (response.status === 413) {
+                        errorMsg = `File Too Large (413): The uploaded file exceeds the maximum allowed size.`;
+                    } else if (response.status === 500) {
+                        errorMsg = `Internal Server Error (500): Something went wrong on the server. Please try again later.`;
+                    } else {
+                        errorMsg = `Upload failed with status ${response.status}: ${errorMsg}`;
+                    }
+                    
+                    updateUI(uploadMessage, `<i class="fas fa-times-circle"></i> Upload failed: ${errorMsg}`, 'error');
+                    updateUI(processingErrorMessage, `<i class="fas fa-exclamation-triangle"></i> Upload Error: ${errorMsg}`, 'error', false);
+                    showDebug(debugUpload, `Upload failed: Status ${response.status}, Details: ${errorMsg}`);
+                }
+            } catch (error) {
+                console.error('Error during upload:', error);
+                let displayError = error.message;
+                if (error instanceof TypeError && error.message === 'Failed to fetch') {
+                    displayError = 'Network error: Could not connect to the server. Please check your internet connection.';
+                } else if (error.message.includes('Server returned non-JSON response')) {
+                    displayError = `Unexpected server response format. (Details: ${error.message})`;
+                }
+                const errorMsg = `Upload error: ${displayError}`;
+                updateUI(uploadMessage, `<i class="fas fa-times-circle"></i> ${errorMsg}`, 'error');
+                updateUI(processingErrorMessage, `<i class="fas fa-exclamation-triangle"></i> ${errorMsg}`, 'error', false);
+                showDebug(debugUpload, errorMsg);
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+
+        function startPollingStatus(video_id, task_id) {
+            if (!video_id || !task_id) {
+                const errorMsg = `Invalid parameters for polling: video_id=${video_id}, task_id=${task_id}`;
+                console.error(errorMsg);
+                processingStatus.textContent = `Error: ${errorMsg}`;
+                updateUI(processingErrorMessage, `<i class="fas fa-exclamation-triangle"></i> ${errorMsg}`, 'error', false);
+                showDebug(debugProcessing, errorMsg);
+                return;
+            }
+
+            clearInterval(pollingInterval);
+            
+            showDebug(debugProcessing, `Setting up polling interval for video_id: ${video_id}`);
+            
+            pollingInterval = setInterval(async () => {
+                try {
+                    const statusUrl = `/app/api/processing-status/${video_id}/?task_id=${task_id}`;
+                    showDebug(debugProcessing, `Polling URL: ${statusUrl}`);
+                    
+                    const response = await fetch(statusUrl);
+                    showDebug(debugProcessing, `Status response: ${response.status}`);
+
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        const textResponse = await response.text();
+                        throw new Error(`Server returned non-JSON response (${response.status}): ${textResponse.substring(0, 200)}...`);
+                    }
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        let errorMsg = data.error || data.message || `An unexpected error occurred.`;
+                        if (response.status === 404) {
+                            errorMsg = `Video or Task Not Found (404). It might have been deleted or the ID is incorrect.`;
+                        } else if (response.status === 400) {
+                             errorMsg = `Bad Request (400): ${JSON.stringify(data.errors || data)}`;
+                        } else if (response.status === 500) {
+                            errorMsg = `Internal Server Error (500) during processing status check.`;
+                        } else {
+                            errorMsg = `Status check failed with status ${response.status}: ${errorMsg}`;
+                        }
+                        
+                        console.error('Error fetching status:', errorMsg);
+                        clearInterval(pollingInterval);
+                        processingStatus.textContent = `Error: ${errorMsg}`;
+                        updateUI(processingErrorMessage, `<i class="fas fa-exclamation-triangle"></i> ${errorMsg}`, 'error', false);
+                        showDebug(debugProcessing, `Status error: Status ${response.status}, Details: ${errorMsg}`);
+                        return;
+                    }
+
+                    const status = data.status;
+                    const meta = data.meta || {};
+                    const percent = Math.round(meta.percent || 0);
+                    const currentProcessStatus = meta.status || status || 'Processing...';
+
+                    showDebug(debugProcessing, `Status: ${status}, Progress: ${percent}%, Message: ${currentProcessStatus}`);
+
+                    progressBar.style.width = `${percent}%`;
+                    progressBar.textContent = `${percent}%`;
+                    processingStatus.textContent = currentProcessStatus;
+                    updateUI(processingErrorMessage, '', 'error', true); // Clear error message when status is OK
+
+                    if (status === 'SUCCESS' || status === 'FAILURE') {
+                        clearInterval(pollingInterval);
+                        showDebug(debugProcessing, `Processing finished with status: ${status}`);
+
+                        if (status === 'SUCCESS') {
+                            progressBar.style.width = '100%';
+                            progressBar.textContent = '100%';
+                            progressBar.classList.remove('failed');
+                            processingStatus.textContent = 'Processing complete!';
+                            
+                            setTimeout(() => {
+                                let hasResults = false;
+                                videoResultsLinks.innerHTML = '';
+                                if (data.processed_video_url) {
+                                    videoResultsLinks.innerHTML += `<a href="${data.processed_video_url}" target="_blank"><i class="fas fa-download"></i> Download Processed Video</a>`;
+                                    hasResults = true;
+                                }
+                                if (data.summary_excel_url) {
+                                    videoResultsLinks.innerHTML += `<a href="${data.summary_excel_url}" target="_blank"><i class="fas fa-file-excel"></i> Download Summary Excel</a>`;
+                                    hasResults = true;
+                                }
+                                if (data.bar_chart_url) {
+                                    videoResultsLinks.innerHTML += `<a href="${data.bar_chart_url}" target="_blank"><i class="fas fa-chart-bar"></i> View Bar Chart</a>`;
+                                    hasResults = true;
+                                }
+                                if (data.pie_chart_url) {
+                                    videoResultsLinks.innerHTML += `<a href="${data.pie_chart_url}" target="_blank"><i class="fas fa-chart-pie"></i> View Pie Chart</a>`;
+                                    hasResults = true;
+                                }
+                                
+                                if (!hasResults) {
+                                    videoResultsLinks.innerHTML = '<p>Processing completed but no download links are available.</p>';
+                                }
+                                
+                                processingSection.style.display = 'none';
+                                resultsSection.style.display = 'block';
+                            }, 1500);
+                        } else if (status === 'FAILURE') {
+                            const errorDetails = meta.error_details || data.error || 'Processing failed with no details provided.';
+                            processingStatus.textContent = `Processing failed: ${errorDetails}`;
+                            updateUI(processingErrorMessage, `<i class="fas fa-exclamation-triangle"></i> Processing Failed: ${errorDetails}`, 'error', false);
+                            progressBar.classList.add('failed');
+                            showDebug(debugProcessing, `Failure details: ${errorDetails}`);
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Network error during status polling:', error);
+                    clearInterval(pollingInterval);
+                    let displayError = error.message;
+                    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+                        displayError = 'Network error: Could not connect to the server for status updates. Please check your internet connection.';
+                    } else if (error.message.includes('Server returned non-JSON response')) {
+                        displayError = `Unexpected server response during status check. (Details: ${error.message})`;
+                    }
+                    const errorMsg = `Polling error: ${displayError}`;
+                    processingStatus.textContent = `Error: ${displayError}`;
+                    updateUI(processingErrorMessage, `<i class="fas fa-exclamation-triangle"></i> ${errorMsg}`, 'error', false);
+                    showDebug(debugProcessing, errorMsg);
+                }
+            }, 2000);
+        }
+
+        // Function to send email summary (add this as a separate function)
+        async function sendEmailSummary() {
+            if (!currentVideoId) {
+                alert("No video has been processed yet to send a summary for.");
+                return;
+            }
+            try {
+                const response = await fetch('/app/api/send-email-summary/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ video_id: currentVideoId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message || "Email summary sent successfully!");
+                } else {
+                    alert(`Failed to send email: ${data.error || data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error("Error sending email summary:", error);
+                alert("Network error or unexpected issue while sending email summary.");
+            }
+        }
+
+        // --- Initial setup: Highlight active link and hide sections on page load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            resetPage(); // Ensures sections are correctly hidden initially and messages set
+
+            // Highlight active navbar link
+            const currentPagePath = window.location.pathname;
+            navLinksContainer.querySelectorAll('a').forEach(link => {
+                if (link.href === window.location.href || (link.href.endsWith('/') && currentPagePath.startsWith(link.pathname))) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            console.log('Page loaded and initialized');
+        });
+    </script>
+</body>
+</html>
