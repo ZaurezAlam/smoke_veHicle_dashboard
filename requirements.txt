@@ -13,4 +13,5 @@ djangorestframework
 Pillow
 openpyxl
 python-dotenv
-Pillow
+celery
+django-celery-results
