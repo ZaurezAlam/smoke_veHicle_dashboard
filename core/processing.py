@@ -68,7 +68,7 @@ def process_video(video_path, output_dir, celery_task_instance=None):
 
 
     # Load YOLO model
-    model = YOLO("/home/zaurez/smoke_vehicle_dashboard_project/core/migrations/media/best.pt")
+    model = YOLO("/home/zaurez/smoke_vehicle_dashboard_project/core/best.pt")
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model.to(device)
     print(f"YOLO model loaded successfully. Using device: {device}")
