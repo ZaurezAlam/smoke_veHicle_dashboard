@@ -184,3 +184,6 @@ def process_video_task(self, video_upload_id, original_video_path):
             shutil.rmtree(processing_output_dir, ignore_errors=True)
         self.update_state(state='FAILURE', meta={'percent': 0, 'status': f'Processing failed: {str(e)}'})
         raise
+
+if __name__ == "__main__":
+    process_video("media/test_vehicles.mp4", "media/processed/")

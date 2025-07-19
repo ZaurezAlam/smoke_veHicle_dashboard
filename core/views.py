@@ -307,13 +307,13 @@ def send_email_summary(request):
                 excel_file_path = None
 
         email_subject = f'Video Analysis Report - Video ID: {video_id}'
-        email_body = f'''Dear Captain Huzaifa,
+        email_body = f'''Dear Authorities,
 
-Email thori jaldi send kardia karo yeh lo ab  {video_id} or dafa hojao .
+The analysis report for the video with ID {video_id} has been successfully generated and processed.
 
 Processed on: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}
 
-Worst regards,
+Best regards,
 Your FYP Project Team'''
         
         try:
