@@ -644,3 +644,6 @@ def reencode_video_for_web(input_path, output_path):
     print(f"Executing ffmpeg GPU command: {' '.join(command)}")
     subprocess.run(command, check=True, capture_output=True, text=True)
     print("GPU ffmpeg encoding complete.")
+
+if __name__ == "__main__":
+    process_video("media/test_vehicles.mp4", "media/processed/")
