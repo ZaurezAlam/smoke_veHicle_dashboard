@@ -40,7 +40,7 @@ Optional but effective use a GPU
 - **Font Awesome** – Icons
 
 ---
-🔎 Note: This project supports both GPU and CPU. If an NVIDIA GPU is available, PyTorch will use it for faster processing. Otherwise, the system will automatically fall back to CPU execution.
+🔎 Note: This project only supports GPU with support for cuda and NVENC required
 
 RESULTS AND OUTPUT
 <img width="1919" height="1034" alt="Screenshot 2025-07-29 132416" src="https://github.com/user-attachments/assets/bb42b37a-9902-47be-a092-0d66ae6c5f76" />
