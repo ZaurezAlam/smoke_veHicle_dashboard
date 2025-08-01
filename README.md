@@ -18,8 +18,7 @@ This project provides a web-based dashboard for uploading videos, processing the
 - **Data Management**: Clear all uploaded and processed video data with a single click, or delete individual video logs.
 
 ---
-NOTE
-Optional but effective use a GPU 
+
 
 ## 🛠️ Technologies Used
 
